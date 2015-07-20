@@ -5,7 +5,7 @@ var ImageSlider = function( parentElementClass, childElementClass, speed ) {
 	var options = {};
 
 	var currentActiveItem;
-
+	var action = -1;
 
 	/**
 	 * [setDefaultOptions description]
@@ -33,12 +33,14 @@ var ImageSlider = function( parentElementClass, childElementClass, speed ) {
 	 * @return {[type]}     [description]
 	 */
 	function calculateTotalWidth() {
+		console.log( 'calculateTotalWidth' );
 	 	var width = 0;
 		$( options.childElementClass ).each( function() {
 			var elementWidth = $( this ).outerWidth( true );
 			width += elementWidth;
-			console.log( 'width : ' + elementWidth );
+			 // console.log( 'width : ' + elementWidth );
 	  	});
+	  	console.log( 'width : ' + width );
 		return width;
 	}
 
@@ -49,7 +51,7 @@ var ImageSlider = function( parentElementClass, childElementClass, speed ) {
 	function windowMidPosition() {
 		var windowWidth = parseInt( $( window ).width(), 10 );
 		var midScreen = parseInt( windowWidth/2, 10 );
-		console.log( 'screen middle' + midScreen );
+		// console.log( 'screen middle' + midScreen );
 		return midScreen;
 	 }
 
@@ -92,13 +94,53 @@ var ImageSlider = function( parentElementClass, childElementClass, speed ) {
 	 * [domEvents description]
 	 * @return {[type]} [description]
 	 */
+	
 	function domEvents() {
+		$('.crs-top-section ,.header-container, .crs-perks-container, .crs-job-posting-section, .footer-container ').click(function(){
+			action = -1;			
+		});
 		$( options.childElementClass ).click( function() {
 			console.log( 'domEvents called' );
-			calculate( this );
-		});
-	}
+			calculate( this );			
+			action =  1;			
+		});	
+		$(".crs-image-item").swipe( {
+		  //Generic swipe handler for all directions
+		  swipeLeft:function(event, direction, distance, duration, fingerCount) {
+		  next(); 
+		  },
+		  swipeRight:function(event, direction, distance, duration, fingerCount) {
+		  prev(); 
+		  }
 
+
+
+
+		  
+		  //Default is 75px, set to 0 for demo so any distance triggers swipe
+		  // threshold:0
+		});	
+	}
+	$( document ).keydown(function(e) {
+		if( action === 1 ){
+			arrowKeys( e );
+		}
+	});
+	function arrowKeys( e ){
+		// console.log('YES');
+		switch( e.which ) {
+            case 37: // left
+            console.log('action : prev : ');	
+            prev();
+            break;
+            case 39: // right
+            console.log('action : next : ');
+            next();
+            break;
+
+            default: return; // exit this handler for other keys
+        }
+   	}
 	function next() {
 		console.log( currentActiveItem );
 		currentActiveItem = currentActiveItem || $( options.childElementClass ).first();
@@ -129,11 +171,12 @@ var ImageSlider = function( parentElementClass, childElementClass, speed ) {
 		console.log( 'called' );
 		setDefaultOptions();
 		domEvents();
-		next();
+		// next();
 	})();
 
 	return {
 		next 	   : next,
-		prev 	   : prev
+		prev 	   : prev,
+
 	}
 };
